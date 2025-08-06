@@ -1,0 +1,85 @@
+################################################################################
+### TEST SETUP
+################################################################################
+
+export LOCAL_TEST="ON"
+export TF_VAR_ARM_SUBSCRIPTION_ID=""
+export TF_VAR_ARM_CLIENT_ID=""
+export TF_VAR_ARM_CLIENT_SECRET=""
+export TF_VAR_ARM_TENANT_ID=""
+export GEMINI_API_KEY=""
+export OPENAI_API_KEY=""
+export ANTHROPIC_API_KEY=""
+export TF_VAR_huggingface_token=""
+export TOTAL_LLM_BUDGET="1000"
+export TOTAL_VCPU="1000"
+export MAX_TASK_CNT="10"
+
+# NODE
+export TF_VAR_usr_vm_size="Standard_D5_v2"
+export TF_VAR_usr_node_count="5"
+
+export BACKEND_RESOURCE_GROUP_NAME="teamatlanta-tfstate-rg"
+export BACKEND_STORAGE_ACCOUNT_NAME="teamatlantatfstate"
+export BACKEND_CONTAINER_NAME="tfstate"
+export BACKEND_KEY="FIXME.tfstate"
+
+# REGISTRY
+export REGISTRY=""
+export IMAGE_VERSION=""
+
+################################################################################
+### ACR and docker resgirty
+################################################################################
+export TF_VAR_acr_server=""
+export TF_VAR_acr_id=""
+export TF_VAR_acr_pw=""
+export TF_VAR_github_id=""
+export TF_VAR_github_pat=""
+################################################################################
+
+################################################################################
+### VM SIZE
+################################################################################
+export TF_VAR_webservice_vm_size="Standard_D32ds_v6"
+export CP_MGR_VM_SIZE="Standard_D32ds_v6"
+export CRS_PATCH_VM_SIZE="Standard_D32ds_v6"
+export TF_VAR_crs_vm_size="Standard_D32ds_v6"
+
+export USERSPACE_NODE_SIZE="64"
+export USERSPACE_MAX_NODE_CNT="4"
+export QUOTA_PER_CP="1000"
+################################################################################
+### DO NOT CHANGE
+################################################################################
+
+export CRS_API_HOSTNAME=""
+export TS_CLIENT_ID=""
+export TS_CLIENT_SECRET=""
+export TS_OP_TAG="t"
+export COMPETITION_API_KEY_ID=""
+export COMPETITION_API_KEY_TOKEN=""
+export CRS_KEY_ID=""
+export CRS_KEY_TOKEN=""
+export GHCR_AUTH=""
+export GITHUB_PAT_TOKEN=""
+
+# Litellm
+export LITELLM_MASTER_KEY=""
+export LITELLM_UI_USERNAME=""
+export LITELLM_UI_PASSWORD=""
+export PRICING_JSON_FILE_PATH="/app/pricing.json"
+export LITELLM_REPLICA="3"
+
+# LLM budget per CP and CRS
+export LLM_budget_CRS_patch="1700" # $300 for using ANTHRROPIC directly
+export LLM_budget_CRS_java="1500"
+export LLM_budget_CRS_multilang="1500"
+export LLM_budget_CRS_userspace="1500"
+export LLM_budget_CRS_sarif="50"
+
+export AIXCC_OTEL_EXPORTER_OTLP_ENDPOINT=""
+export AIXCC_OTEL_EXPORTER_OTLP_HEADERS=""
+export OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+export COMPETITION_URL=""
+################################################################################

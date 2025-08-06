@@ -1,0 +1,26 @@
+[project]
+name = "python-trainer"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "trl",
+    "p4",
+    "vllm>=0.8.5.post1",
+    "wandb>=0.19.9",
+    "scikit-learn>=1.6.1",
+    "peft>=0.15.2",
+    "liger-kernel>=0.5.8",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["trainer"]
+
+[tool.uv.sources]
+trl = { git = "https://github.com/huggingface/trl.git", rev = "cafa663c840cff0603ec427f7500fff1af54b072" }
+p4 = { workspace = true }

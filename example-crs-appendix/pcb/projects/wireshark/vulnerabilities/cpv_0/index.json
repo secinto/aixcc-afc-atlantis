@@ -1,0 +1,7 @@
+{
+  "name": "cpv_0",
+  "harness": "fuzzshark_ip",
+  "sanitizer": "address",
+  "error_token": "ERROR: AddressSanitizer: global-buffer-overflow",
+  "base_commit": "1fa7f7728e07f491dea20197b391c7b12c0f4818"
+}

@@ -1,0 +1,7 @@
+{
+  "name": "cpv_3",
+  "harness": "libcommon_fuzz_utf8",
+  "sanitizer": "address",
+  "error_token": "AddressSanitizer: heap-buffer-overflow",
+  "base_commit": "806fb8aaceecebe5497192db21a194bf2bec4666"
+}

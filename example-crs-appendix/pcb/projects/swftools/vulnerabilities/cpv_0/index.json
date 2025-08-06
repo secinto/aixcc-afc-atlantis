@@ -1,0 +1,7 @@
+{
+  "name": "cpv_0",
+  "harness": "fuzz_swfdump",
+  "sanitizer": "address",
+  "error_token": "AddressSanitizer: stack-use-after-scope",
+  "base_commit": "e05d80179197ad8eb764032774fcd3a2c539acfe"
+}

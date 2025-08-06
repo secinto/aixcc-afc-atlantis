@@ -1,0 +1,325 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crs-webapp
+  labels:
+    app: crs-webapp
+    namespace: crs-webservice
+spec:
+  selector:
+    matchLabels:
+      app: crs-webapp
+  template:
+    metadata:
+      labels:
+        app: crs-webapp
+    spec:
+      nodeSelector:
+        webservice-node: "true"
+      serviceAccountName: k8s-full-control
+      initContainers:
+        - name: init-permissions
+          image: postgres:17.4-bookworm
+          command: ['sh', '-c', 'rm -rf /crs-db/crs-webservice; mkdir /crs-db/crs-webservice']
+          volumeMounts:
+            - name: crs-db
+              mountPath: /crs-db
+      containers:
+        - name: crs-webapp
+          image: ${REGISTRY}/crs_webserver:${IMAGE_VERSION}
+          ports:
+            - name: http
+              containerPort: 80
+          env:
+            - name: CRS_KEY_ID
+              value: ${CRS_KEY_ID}
+            - name: COMPETITION_URL
+              value: ${COMPETITION_URL}
+            - name: COMPETITION_API_KEY_ID
+              value: ${COMPETITION_API_KEY_ID}
+            - name: CRS_KEY_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: crs-secrets
+                  key: CRS_KEY_TOKEN
+            - name: COMPETITION_API_KEY_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: crs-secrets
+                  key: COMPETITION_API_KEY_TOKEN
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: REGISTRY
+              value: ${REGISTRY}
+            - name: IMAGE_VERSION
+              value: ${IMAGE_VERSION}
+            - name: AZURE_SUBSCRIPTION_ID
+              value: ${TF_VAR_ARM_SUBSCRIPTION_ID}
+            - name: AZURE_CLIENT_ID
+              value: ${TF_VAR_ARM_CLIENT_ID}
+            - name: AZURE_CLIENT_SECRET
+              value: ${TF_VAR_ARM_CLIENT_SECRET}
+            - name: AZURE_TENANT_ID
+              value: ${TF_VAR_ARM_TENANT_ID}
+            - name: CLUSTER_NAME
+              value: ${KUBERNETES_CLUSTER_NAME}
+            - name: RESOURCE_GROUP
+              value: ${RESOURCE_GROUP_NAME}
+            - name: CRS_REDIS_ENDPOINT
+              value: "redis://localhost:6379"
+            - name: LITELLM_MULTILANG_URL
+              value: "http://litellm-multilang:4000"
+            - name: LITELLM_PATCH_URL
+              value: "http://litellm-patch:4000"
+            - name: LITELLM_USER_JAVA_URL
+              value: "http://litellm-user-java:4000"
+            - name: LITELLM_MASTER_KEY
+              value: ${LITELLM_MASTER_KEY}
+            - name: VLLM_API_BASE
+              value: "http://p3:8000/v1"
+            - name: ADAPTER_API_BASE
+              value: "http://p3:8001"
+            - name: LLM_budget_CRS_patch
+              value: "${LLM_budget_CRS_patch}"
+            - name: LLM_budget_CRS_java
+              value: "${LLM_budget_CRS_java}"
+            - name: LLM_budget_CRS_multilang
+              value: "${LLM_budget_CRS_multilang}"
+            - name: LLM_budget_CRS_userspace
+              value: "${LLM_budget_CRS_userspace}"
+            - name: TOTAL_LLM_BUDGET
+              value: "${TOTAL_LLM_BUDGET}"
+            - name: TOTAL_VCPU
+              value: "${TOTAL_VCPU}"
+            - name: MAX_TASK_CNT
+              value: "${MAX_TASK_CNT}"
+            - name: ANTHROPIC_API_KEY
+              value: ${ANTHROPIC_API_KEY}
+            - name: AIXCC_OTLP_ENDPOINT
+              value: "http://otel:4317"
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: ${OTEL_EXPORTER_OTLP_PROTOCOL}
+            - name: CRS_TASK_METADATA_JSON
+              value: ${OTEL_TASK_METADATA_JSON}
+            - name: CRS_SERVICE_NAME
+              value: crs_webserver
+            - name: CRS_ACTION_CATEGORY
+              value: building
+            - name: CRS_ACTION_NAME
+              value: crs_webserver
+            - name: USERSPACE_NODE_SIZE
+              value: "${USERSPACE_NODE_SIZE}"
+            - name: USERSPACE_MAX_NODE_CNT
+              value: "${USERSPACE_MAX_NODE_CNT}"
+            - name: CRS_SARIF_LLM_BUDGET
+              value: "${CRS_SARIF_LLM_BUDGET}"
+            - name: CP_MGR_VM_SIZE
+              value: "${CP_MGR_VM_SIZE}"
+            - name: CRS_PATCH_VM_SIZE
+              value: "${CRS_PATCH_VM_SIZE}"
+            - name: QUOTA_PER_CP
+              value: "${QUOTA_PER_CP}"
+            - name: TEST_ROUND
+              value: "${TEST_ROUND}"
+          volumeMounts:
+            - name: tarball-fs-volume
+              mountPath: /tarball-fs
+            - name: otel-fs-volume
+              mountPath: /otel-fs
+            - name: shared-crs-fs-volume
+              mountPath: /shared-crs-fs
+            - name: crs-multilang-db
+              mountPath: /crs-multilang-db
+            - name: litellm-db
+              mountPath: /litellm-db
+          #livenessProbe:
+          #  httpGet:
+          #    path: "/"
+          #    port: "http"
+          #  initialDelaySeconds: 5
+          #  periodSeconds: 10
+          #  timeoutSeconds: 3
+          #  failureThreshold: 3
+          #readinessProbe:
+          #  httpGet:
+          #    path: "/"
+          #    port: "http"
+          #  initialDelaySeconds: 5
+          #  periodSeconds: 5
+          #  timeoutSeconds: 3
+          #  failureThreshold: 1
+        - name: crs-webservice-redis
+          image: redis:6.2-alpine
+          command: ['redis-server', '--dir', '/crs-db/crs-webservice']
+          ports:
+            - name: redis
+              containerPort: 6379
+          volumeMounts:
+            - name: crs-db
+              mountPath: /crs-db
+      volumes:
+        - name: tarball-fs-volume
+          persistentVolumeClaim:
+            claimName: tarball-fs
+        - name: otel-fs-volume
+          persistentVolumeClaim:
+            claimName: otel-fs
+        - name: shared-crs-fs-volume
+          persistentVolumeClaim:
+            claimName: shared-crs-fs
+        - name: crs-db
+          persistentVolumeClaim:
+            claimName: crs-db-backup
+        - name: crs-multilang-db
+          persistentVolumeClaim:
+            claimName: crs-multilang-db-backup
+        - name: litellm-db
+          persistentVolumeClaim:
+              claimName: litellm-db-backup
+      imagePullSecrets:
+        - name: registry-secret
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: huggingface
+  namespace: crs-webservice
+type: Opaque
+stringData:
+  token: ${TF_VAR_huggingface_token}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: p3
+  namespace: crs-webservice
+  labels:
+    app: p3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: p3
+  template:
+    metadata:
+      labels:
+        app: p3
+    spec:
+      nodeSelector:
+        accelerator: nvidia
+      imagePullSecrets:
+        - name: registry-secret
+      volumes:
+        - name: shm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 20Gi
+      containers:
+        - name: p3
+          image: ${REGISTRY}/crs-p3:${IMAGE_VERSION}
+          env:
+            - name: SERVER_PORT
+              value: "8000"
+            - name: ADAPTER_PORT
+              value: "8001"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://otel:4317
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: "grpc"
+          ports:
+            - containerPort: 8000
+              name: http
+          resources:
+            limits:
+              cpu: "64"
+              memory: 256Gi
+              nvidia.com/gpu: "4"
+            requests:
+              cpu: "32"
+              memory: 32Gi
+              nvidia.com/gpu: "4"
+          volumeMounts:
+            - name: shm
+              mountPath: /dev/shm
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 300
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 300
+            periodSeconds: 10
+################################################################################
+#### OPENTELMETRY
+################################################################################
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel
+  labels:
+    app: otel
+    namespace: crs-webservice
+spec:
+  selector:
+    matchLabels:
+      app: otel
+  template:
+    metadata:
+      labels:
+        app: otel
+    spec:
+      nodeSelector:
+        otel-node: "true"
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - crs-webapp
+                topologyKey: "kubernetes.io/hostname"
+      volumes:
+        - name: otel-fs-volume
+          persistentVolumeClaim:
+            claimName: otel-fs
+        - name: otel-collector-config
+          configMap:
+            name: otel-collector-sidecar-config
+      containers:
+        - name: otel-collector-sidecar
+          image: otel/opentelemetry-collector-contrib:latest
+          command:
+            - "/otelcol-contrib"
+            - "--config=/conf/otel-collector-config"
+          ports:
+            - name: port
+              containerPort: 4317
+          env:
+            - name: K8S_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: K8S_NAMESPACE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - name: otel-fs-volume
+              mountPath: /otel-fs
+            - name: otel-collector-config
+              mountPath: /conf
+---

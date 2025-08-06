@@ -1,0 +1,15 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+sharedlibdir=${libdir}
+plugindir=${libdir}/wireshark/plugins
+plugin_suffix=@CMAKE_SHARED_MODULE_SUFFIX@.@PROJECT_ABI_VERSION_EPAN@
+
+Name: Wireshark
+Description: Network Protocol Analyzer (Packet Dissection Library)
+Version: @PROJECT_VERSION@
+
+Requires: glib-2.0, gmodule-2.0, gthread-2.0
+Libs: -L${libdir} -lwireshark -lwsutil
+Cflags: -I${includedir}/wireshark

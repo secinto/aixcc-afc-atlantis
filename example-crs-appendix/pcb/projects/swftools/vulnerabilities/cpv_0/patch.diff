@@ -1,0 +1,35 @@
+diff --git a/lib/rfxswf.c b/lib/rfxswf.c
+index 41988db0..0035ee8b 100644
+--- a/lib/rfxswf.c
++++ b/lib/rfxswf.c
+@@ -7,7 +7,7 @@
+ 
+    Part of the swftools package.
+ 
+-   Copyright (c) 2000-2003 Rainer Böhme <rfxswf@reflex-studio.de>
++   Copyright (c) 2000-2003 Rainer Bï¿½hme <rfxswf@reflex-studio.de>
+    Copyright (c) 2003 Matthias Kramm <kramm@quiss.org> 
+ 
+    This program is free software; you can redistribute it and/or modify
+@@ -1566,7 +1566,8 @@ int swf_ReadSWF2(reader_t*reader, SWF * swf)   // Reads SWF to memory (malloc'ed
+     int len;
+     TAG * t;
+     TAG t1;
+-    reader_t zreader;
++    // reader_t zreader;
++    reader_t* zreader;
+     
+     if ((len = reader->read(reader ,b,8))<8) return -1;
+ 
+@@ -1578,8 +1579,9 @@ int swf_ReadSWF2(reader_t*reader, SWF * swf)   // Reads SWF to memory (malloc'ed
+     swf->fileSize    = GET32(&b[4]);
+     
+     if(swf->compressed) {
+-	reader_init_zlibinflate(&zreader, reader);
+-	reader = &zreader;
++        zreader = (reader_t*)rfx_alloc(sizeof(reader_t));
++	    reader_init_zlibinflate(zreader, reader);
++	    reader = zreader;
+     }
+     swf->compressed = 0; // derive from version number from now on
+ 

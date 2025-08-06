@@ -1,0 +1,7 @@
+{
+  "name": "cpv_1",
+  "harness": "fuzz_nm",
+  "sanitizer": "address",
+  "error_token": "AddressSanitizer: heap-use-after-free",
+  "base_commit": "f3c80b3bbaa8aaaebddb74c51099a01af4767e7c"
+}

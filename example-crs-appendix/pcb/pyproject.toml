@@ -1,0 +1,41 @@
+[project]
+name = "pcb"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "click>=8.2.1",
+    "joblib>=1.5.1",
+    "p4",
+    "python-oss-fuzz",
+    "python-oss-fuzz-vulnerability",
+    "python-trainer",
+    "python-docker-extension",
+    "python-llm",
+]
+
+[tool.uv.workspace]
+members = [
+    "packages/p4",
+    "packages/python-oss-fuzz",
+    "packages/python-oss-fuzz-vulnerability",
+    "packages/python-trainer",
+    "packages/python-docker-extension",
+    "packages/python-llm",
+]
+
+[tool.uv.sources]
+p4 = { workspace = true }
+python-oss-fuzz = { workspace = true }
+python-oss-fuzz-vulnerability = { workspace = true }
+python-trainer = { workspace = true }
+python-docker-extension = { workspace = true }
+python-llm = { workspace = true }
+
+[tool.pyright]
+typeCheckingMode = "strict"
+exclude = ["**/node_modules", "**/__pycache__", "**/.*", "/projects"]
+
+[dependency-groups]
+dev = ["joblib-stubs>=1.5.0.1.20250510", "pyright>=1.1.402", "ruff>=0.11.13"]

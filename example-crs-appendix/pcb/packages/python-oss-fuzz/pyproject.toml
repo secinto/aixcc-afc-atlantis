@@ -1,0 +1,25 @@
+[project]
+name = "python-oss-fuzz"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "docker>=7.1.0",
+    "pydantic>=2.11.7",
+    "pyyaml>=6.0.2",
+    "p4",
+    "python-docker-extension",
+    "python-oss-fuzz-vulnerability",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["oss_fuzz"]
+
+[tool.uv.sources]
+p4 = { workspace = true }
+python-docker-extension = { workspace = true }

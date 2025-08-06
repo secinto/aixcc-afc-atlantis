@@ -1,0 +1,8 @@
+main_repo: "git@github.com:Team-Atlanta/cp-c-swftools-src.git"
+language: c
+sanitizers:
+  - address
+fuzzing_engines:
+  - libfuzzer
+
+disabled: true #Build fails

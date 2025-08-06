@@ -1,0 +1,7 @@
+{
+  "name": "cpv_2",
+  "harness": "dynsec_fuzz_load",
+  "sanitizer": "address",
+  "error_token": "AddressSanitizer: heap-use-after-free",
+  "base_commit": "806fb8aaceecebe5497192db21a194bf2bec4666"
+}

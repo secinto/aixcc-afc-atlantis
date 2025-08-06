@@ -1,0 +1,7 @@
+{
+  "name": "cpv_0",
+  "harness": "broker_fuzz_test_config",
+  "sanitizer": "address",
+  "error_token": "AddressSanitizer: heap-buffer-overflow",
+  "base_commit": "806fb8aaceecebe5497192db21a194bf2bec4666"
+}

@@ -1,0 +1,6 @@
+<!DOCTYPE doc [
+<!ENTITY % foo ']>
+<doc>Hell<oc (#PCDATA)*>'>
+%foo;
+]>
+<doc>Hello, world</dVc>

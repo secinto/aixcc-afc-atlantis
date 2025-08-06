@@ -1,0 +1,7 @@
+{
+  "name": "cpv_0",
+  "harness": "php-fuzz-execute",
+  "sanitizer": "address",
+  "error_token": "ERROR: AddressSanitizer: global-buffer-overflow",
+  "base_commit": "8690d99ba50e7b2f5e9115b334e354f196c9f753"
+}

@@ -1,0 +1,7 @@
+{
+  "name": "cpv_0",
+  "harness": "sleuthkit_fls_ntfs_fuzzer",
+  "sanitizer": "address",
+  "error_token": "ERROR: AddressSanitizer: memcpy-param-overlap",
+  "base_commit": "0f204b5e36bd89d1afe5de29b32e49dc4a5d2acf"
+}

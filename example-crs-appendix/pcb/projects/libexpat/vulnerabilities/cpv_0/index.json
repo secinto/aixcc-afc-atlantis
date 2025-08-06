@@ -1,0 +1,7 @@
+{
+  "name": "cpv_0",
+  "harness": "position_pointer",
+  "sanitizer": "address",
+  "error_token": "AddressSanitizer: heap-buffer-overflow",
+  "base_commit": "39e487da353b20bb3a724311d179ba0fddffc65b"
+}

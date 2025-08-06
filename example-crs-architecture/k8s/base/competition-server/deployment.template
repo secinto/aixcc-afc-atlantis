@@ -1,0 +1,131 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: competition-server
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: scantron-config
+data:
+  scantron.yaml: |
+    # Example Config File
+
+    teams:
+      # This is the API key your CRS uses to get access
+      # to the submission endpoints
+      - id: ${COMPETITION_API_KEY_ID}
+        note: Test Key for Local Auth
+        api_key:
+          token: ${COMPETITION_API_KEY_TOKEN}
+          active: true
+          permissions:
+            crs: true
+            competition_management: true
+
+        crs:
+          # The url of your CRS. If you are running your CRS on localhost, keep the
+          # url as host.docker.internal
+          taskme: true
+          url: http://crs-webapp.crs-webservice.svc.cluster.local:80 # This should stay the same, so the scantron docker container can communicate with the outside world
+          api_key_id: ${CRS_KEY_ID}
+          api_key_token: ${CRS_KEY_TOKEN}
+
+    logging:
+      gorm:
+        level: 0
+        trace_queries: true
+      app:
+        level: -4
+
+    round_id: testing
+
+    # Listen address outside the container
+    listen_address: "[::]:1323"
+    api_host_and_port: "competition-server.competition-server.svc.cluster.local:1323"
+
+    github:
+      # GitHub Personal Access token. This is used by the server to download the
+      # appropriate fuzz tooling if not using public repositories
+      pat: ${GITHUB_PAT_TOKEN}
+
+    generate:
+      enabled: true
+      delta:
+        repo_url: "https://github.com/aixcc-finals/integration-test.git"
+        base_ref: "5ac0917575e20464b5aa86434dff2a7626b558b4"
+        head_ref: "challenges/integration-test-delta-01"
+        fuzz_tooling_url: "https://github.com/aixcc-finals/oss-fuzz-aixcc.git"
+        fuzz_tooling_ref: "v1.1.0"
+        fuzz_tooling_project_name: "integration-test"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: competition-server
+  labels:
+    app: competition-server
+spec:
+  nodeSelector:
+    capi-node: "true"
+  # hostAliases: # docker only stuff, to access the localhost, not sure if its required
+  # - ip: "host-gateway"
+  #   hostnames:
+  #   - host.docker.internal
+  containers:
+    - name: dind
+      image: docker:28-dind
+      command: ["dockerd"]
+      args: ["-H", "tcp://0.0.0.0:2375", "--tls=false", "--storage-driver=overlay2"]
+      ports:
+        - containerPort: 2375
+      env:
+        - name: DOCKER_TLS_CERTDIR
+          value: ""
+        - name: DOCKER_DEFAULT_PLATFORM
+          value: "linux/amd64"
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - name: shared-tmp
+          mountPath: /tmp
+    - name: scantron
+      image: ghcr.io/aixcc-finals/example-crs-architecture/competition-test-api:v1.4-rc1
+      command: ["/bin/bash", "-c", "/app/server"]
+      ports:
+        - containerPort: 1323
+      env:
+        - name: DOCKER_HOST
+          value: "tcp://localhost:2375"
+        - name: DOCKER_DEFAULT_PLATFORM
+          value: "linux/amd64"
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - name: shared-tmp
+          mountPath: /tmp
+        - name: scantron-config
+          mountPath: /etc/scantron/scantron.yaml
+          subPath: scantron.yaml
+  volumes:
+    - name: shared-tmp
+      emptyDir: {}
+    - name: scantron-config
+      configMap:
+        name: scantron-config
+  imagePullSecrets:
+    - name: ghcr-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: competition-server
+spec:
+  selector:
+    app: competition-server
+  ports:
+    - protocol: TCP
+      port: 1323
+      targetPort: 1323
+  type: ClusterIP
+

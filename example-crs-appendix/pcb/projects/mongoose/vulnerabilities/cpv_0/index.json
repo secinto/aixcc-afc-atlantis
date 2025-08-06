@@ -1,0 +1,7 @@
+{
+  "name": "cpv_0",
+  "harness": "fuzz",
+  "sanitizer": "address",
+  "error_token": "ERROR: AddressSanitizer: dynamic-stack-buffer-overflow",
+  "base_commit": "b8afaa4f662db2a030ea412a3e0d2b2c93a8bf24"
+}
